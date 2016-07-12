@@ -1,7 +1,9 @@
 package org.inventivetalent.data.test;
 
 import com.google.gson.JsonObject;
+import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
+import org.inventivetalent.data.mapper.AsyncStringValueMapper;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.testng.annotations.Test;
 
@@ -56,6 +58,43 @@ public class MongoDbTest extends AbstractKeyValueTest {
 		}
 
 		latch.await();
+	}
+
+	@Test(enabled = false)
+	public void stringMapperTest() throws InterruptedException {
+		AsyncDataProvider<String> stringProvider = AsyncStringValueMapper.mongoDb(this.provider);
+
+		CountDownLatch latch = new CountDownLatch(2);
+
+		stringProvider.put("foo", new DataCallable<String>() {
+			@Nonnull
+			@Override
+			public String provide() {
+				latch.countDown();
+				return "bar";
+			}
+		});
+		stringProvider.put("foo1", new DataCallable<String>() {
+			@Nonnull
+			@Override
+			public String provide() {
+				latch.countDown();
+				return "bar1";
+			}
+		});
+		latch.await();
+
+		CountDownLatch latch1 = new CountDownLatch(2);
+		stringProvider.get("foo", s -> {
+			assertNotNull(s);
+			assertEquals(s, "bar");
+			latch1.countDown();
+		});
+		stringProvider.get("foo1", s -> {
+			assertNotNull(s);
+			assertEquals(s, "bar1");
+			latch1.countDown();
+		});
 	}
 
 }
