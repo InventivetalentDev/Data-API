@@ -8,6 +8,9 @@ public class KeyValueBean extends KeyBean {
 
 	private String value;
 
+	public KeyValueBean() {
+	}
+
 	@ConstructorProperties({
 								   "name",
 								   "value" })

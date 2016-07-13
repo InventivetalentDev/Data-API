@@ -8,10 +8,15 @@ import javax.persistence.Version;
 @Entity
 public class KeyBean {
 
+
+
 	@Id      int  id;
 	@Version long version;
 
 	@Column(unique = true) String key;
+
+	public KeyBean() {
+	}
 
 	public void setId(int id) {
 		this.id = id;
