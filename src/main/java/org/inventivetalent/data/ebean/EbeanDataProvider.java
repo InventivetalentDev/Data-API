@@ -44,8 +44,20 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 		execute(() -> {
 			V entry;
 			boolean exists = (entry = getDatabase().find(beanClass).where().eq("key", key).findUnique()) != null;
+
+			int id = -1;
+			long version = 0;
+			if (entry != null) {
+				id = entry.getId();
+				version = entry.getVersion();
+			}
+
 			entry = value;
 			entry.setKey(key);
+			if (id != -1) {
+				entry.setId(id);
+				entry.setVersion(version);
+			}
 			if (!exists) {
 				getDatabase().save(entry);
 			} else {
