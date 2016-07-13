@@ -4,6 +4,7 @@ import com.google.gson.JsonObject;
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
+import org.inventivetalent.data.ebean.BeanProvider;
 import org.inventivetalent.data.ebean.EbeanDataProvider;
 import org.inventivetalent.data.ebean.KeyValueBean;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
@@ -132,7 +133,7 @@ public abstract class AsyncStringValueMapper {
 		};
 	}
 
-	public static AsyncDataProvider<String> ebean(EbeanDataProvider<KeyValueBean> provider) {
+	public static <B extends KeyValueBean> AsyncDataProvider<String> ebean(EbeanDataProvider<B> provider,BeanProvider<B> beanProvider) {
 		return new AsyncDataProvider<String>() {
 
 			@Override
@@ -145,41 +146,45 @@ public abstract class AsyncStringValueMapper {
 				return provider.getExecutor();
 			}
 
+			B createBean(String key,String value) {
+				return beanProvider.provide(key, value);
+			}
+
 			@Override
 			public void put(@Nonnull String key, @Nonnull String value) {
-				provider.put(key, new KeyValueBean(key, value));
+				provider.put(key, createBean(key, value));
 			}
 
 			@Override
 			public void put(@Nonnull String key, @Nonnull DataCallable<String> valueCallable) {
-				provider.put(key, new DataCallable<KeyValueBean>() {
+				provider.put(key, new DataCallable<B>() {
 					@Nonnull
 					@Override
-					public KeyValueBean provide() {
-						return new KeyValueBean(key, valueCallable.provide());
+					public B provide() {
+						return createBean(key, valueCallable.provide());
 					}
 				});
 			}
 
 			@Override
 			public void putAll(@Nonnull Map<String, String> map) {
-				Map<String, KeyValueBean> beanMap = new HashMap<>();
+				Map<String, B> beanMap = new HashMap<>();
 				for (Map.Entry<String, String> entry : map.entrySet()) {
-					beanMap.put(entry.getKey(), new KeyValueBean(entry.getKey(), entry.getValue()));
+					beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue()));
 				}
 				provider.putAll(beanMap);
 			}
 
 			@Override
 			public void putAll(@Nonnull DataCallable<Map<String, String>> mapCallable) {
-				provider.putAll(new DataCallable<Map<String, KeyValueBean>>() {
+				provider.putAll(new DataCallable<Map<String, B>>() {
 					@Nonnull
 					@Override
-					public Map<String, KeyValueBean> provide() {
+					public Map<String, B> provide() {
 						Map<String, String> map = mapCallable.provide();
-						Map<String, KeyValueBean> beanMap = new HashMap<>();
+						Map<String, B> beanMap = new HashMap<>();
 						for (Map.Entry<String, String> entry : map.entrySet()) {
-							beanMap.put(entry.getKey(), new KeyValueBean(entry.getKey(), entry.getValue()));
+							beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue()));
 						}
 						return beanMap;
 					}
@@ -213,13 +218,13 @@ public abstract class AsyncStringValueMapper {
 
 			@Override
 			public void entries(@Nonnull DataCallback<Map<String, String>> callback) {
-				provider.entries(stringKeyValueBeanMap -> {
+				provider.entries(stringBMap -> {
 					Map<String, String> stringMap = new HashMap<>();
-					if (stringKeyValueBeanMap == null) {
+					if (stringBMap == null) {
 						callback.provide(null);
 						return;
 					}
-					for (Map.Entry<String, KeyValueBean> entry : stringKeyValueBeanMap.entrySet()) {
+					for (Map.Entry<String, B> entry : stringBMap.entrySet()) {
 						stringMap.put(entry.getKey(), entry.getValue().getValue());
 					}
 					callback.provide(stringMap);

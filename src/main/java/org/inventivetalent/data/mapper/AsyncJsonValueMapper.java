@@ -5,6 +5,7 @@ import com.google.gson.JsonParser;
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
+import org.inventivetalent.data.ebean.BeanProvider;
 import org.inventivetalent.data.ebean.EbeanDataProvider;
 import org.inventivetalent.data.ebean.KeyValueBean;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
@@ -125,7 +126,7 @@ public class AsyncJsonValueMapper {
 		};
 	}
 
-	public static AsyncDataProvider<JsonObject> ebean(EbeanDataProvider<KeyValueBean> provider) {
+	public static <B extends KeyValueBean> AsyncDataProvider<JsonObject> ebean(EbeanDataProvider<B> provider,BeanProvider<B> beanProvider) {
 		return new AsyncDataProvider<JsonObject>() {
 
 			final JsonParser parser = new JsonParser();
@@ -140,41 +141,45 @@ public class AsyncJsonValueMapper {
 				return provider.getExecutor();
 			}
 
+			B createBean(String key, String value) {
+				return beanProvider.provide(key, value);
+			}
+
 			@Override
 			public void put(@Nonnull String key, @Nonnull JsonObject value) {
-				provider.put(key, new KeyValueBean(key, value.toString()));
+				provider.put(key, createBean(key, value.toString()));
 			}
 
 			@Override
 			public void put(@Nonnull String key, @Nonnull DataCallable<JsonObject> valueCallable) {
-				provider.put(key, new DataCallable<KeyValueBean>() {
+				provider.put(key, new DataCallable<B>() {
 					@Nonnull
 					@Override
-					public KeyValueBean provide() {
-						return new KeyValueBean(key, valueCallable.provide().toString());
+					public B provide() {
+						return  createBean(key, valueCallable.provide().toString());
 					}
 				});
 			}
 
 			@Override
 			public void putAll(@Nonnull Map<String, JsonObject> map) {
-				Map<String, KeyValueBean> beanMap = new HashMap<>();
+				Map<String, B> beanMap = new HashMap<>();
 				for (Map.Entry<String, JsonObject> entry : map.entrySet()) {
-					beanMap.put(entry.getKey(), new KeyValueBean(entry.getKey(), entry.getValue().toString()));
+					beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue().toString()));
 				}
 				provider.putAll(beanMap);
 			}
 
 			@Override
 			public void putAll(@Nonnull DataCallable<Map<String, JsonObject>> mapCallable) {
-				provider.putAll(new DataCallable<Map<String, KeyValueBean>>() {
+				provider.putAll(new DataCallable<Map<String, B>>() {
 					@Nonnull
 					@Override
-					public Map<String, KeyValueBean> provide() {
+					public Map<String, B> provide() {
 						Map<String, JsonObject> jsonMap = mapCallable.provide();
-						Map<String, KeyValueBean> beanMap = new HashMap<>();
+						Map<String, B> beanMap = new HashMap<>();
 						for (Map.Entry<String, JsonObject> entry : jsonMap.entrySet()) {
-							beanMap.put(entry.getKey(), new KeyValueBean(entry.getKey(), entry.getValue().toString()));
+							beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue().toString()));
 						}
 						return beanMap;
 					}
@@ -208,13 +213,13 @@ public class AsyncJsonValueMapper {
 
 			@Override
 			public void entries(@Nonnull DataCallback<Map<String, JsonObject>> callback) {
-				provider.entries(stringKeyValueBeanMap -> {
+				provider.entries(stringBMap -> {
 					Map<String, JsonObject> jsonMap = new HashMap<>();
-					if (stringKeyValueBeanMap == null) {
+					if (stringBMap == null) {
 						callback.provide(jsonMap);
 						return;
 					}
-					for (Map.Entry<String, KeyValueBean> entry : stringKeyValueBeanMap.entrySet()) {
+					for (Map.Entry<String, B> entry : stringBMap.entrySet()) {
 						jsonMap.put(entry.getKey(), parser.parse(entry.getValue().getValue()).getAsJsonObject());
 					}
 					callback.provide(jsonMap);
