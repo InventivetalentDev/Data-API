@@ -1,26 +1,30 @@
 package org.inventivetalent.data.test;
 
-import com.google.gson.JsonObject;
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.mapper.AsyncCacheMapper;
 import org.inventivetalent.data.mapper.AsyncStringValueMapper;
-import org.inventivetalent.data.mongodb.MongoDbDataProvider;
+import org.inventivetalent.data.redis.RedisDataProvider;
 import org.testng.annotations.Test;
+import redis.clients.jedis.Jedis;
 
 import javax.annotation.Nonnull;
 import java.util.concurrent.CountDownLatch;
 
-import static org.testng.Assert.*;
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
 @Test
-public class MongoDbTest extends AbstractKeyValueTest {
+public class RedisTestX extends AbstractKeyValueTest {
 
-	private MongoDbDataProvider provider;
+	private RedisDataProvider provider;
 
-	public MongoDbTest() {
+	public RedisTestX() {
 		super();
-		this.provider = new MongoDbDataProvider("192.168.178.34", 27017, "", new char[0], null, "data_test", "c1");
+		Jedis jedis = new Jedis("192.168.178.34", 6379);
+		jedis.connect();
+		this.provider = new RedisDataProvider(jedis);
 	}
 
 	@Test
@@ -29,14 +33,12 @@ public class MongoDbTest extends AbstractKeyValueTest {
 
 		for (int i = 0; i < keys.size(); i++) {
 			final int finalI = i;
-			provider.put(keys.get(i), new DataCallable<JsonObject>() {
+			provider.put(keys.get(i), new DataCallable<String>() {
 				@Nonnull
 				@Override
-				public JsonObject provide() {
+				public String provide() {
 					latch.countDown();
-					JsonObject jsonObject = new JsonObject();
-					jsonObject.addProperty("val", values.get(finalI));
-					return jsonObject;
+					return values.get(finalI);
 				}
 			});
 		}
@@ -50,10 +52,9 @@ public class MongoDbTest extends AbstractKeyValueTest {
 
 		for (int i = 0; i < keys.size(); i++) {
 			final int finalI = i;
-			provider.get(keys.get(i), jsonObject -> {
-				assertNotNull(jsonObject);
-				assertTrue(jsonObject.has("val"));
-				assertEquals(jsonObject.get("val").getAsString(), values.get(finalI));
+			provider.get(keys.get(i), string -> {
+				assertNotNull(string);
+				assertEquals(string, values.get(finalI));
 				latch.countDown();
 			});
 		}
@@ -63,7 +64,7 @@ public class MongoDbTest extends AbstractKeyValueTest {
 
 	@Test
 	public void stringMapperTest() throws InterruptedException {
-		AsyncDataProvider<String> stringProvider = AsyncStringValueMapper.mongoDb(this.provider);
+		AsyncDataProvider<String> stringProvider = AsyncStringValueMapper.redis(this.provider);
 
 		CountDownLatch latch = new CountDownLatch(2);
 
@@ -96,12 +97,11 @@ public class MongoDbTest extends AbstractKeyValueTest {
 			assertEquals(s, "bar1");
 			latch1.countDown();
 		});
-		latch1.await();
 	}
 
 	@Test
 	public void cacheTest() throws InterruptedException {
-		AsyncCacheMapper.CachedDataProvider<String> cache = AsyncCacheMapper.create(AsyncStringValueMapper.mongoDb(this.provider));
+		AsyncCacheMapper.CachedDataProvider<String> cache = AsyncCacheMapper.create(AsyncStringValueMapper.redis(this.provider));
 
 		assertNull(cache.get("foo"));// Should be null before it's cached
 
@@ -114,5 +114,6 @@ public class MongoDbTest extends AbstractKeyValueTest {
 
 		assertNotNull(cache.get("foo"));// Should exist after caching
 	}
+
 
 }
