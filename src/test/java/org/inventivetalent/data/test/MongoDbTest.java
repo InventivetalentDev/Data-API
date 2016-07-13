@@ -3,6 +3,7 @@ package org.inventivetalent.data.test;
 import com.google.gson.JsonObject;
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
+import org.inventivetalent.data.mapper.AsyncCacheMapper;
 import org.inventivetalent.data.mapper.AsyncStringValueMapper;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.testng.annotations.Test;
@@ -96,6 +97,22 @@ public class MongoDbTest extends AbstractKeyValueTest {
 			latch1.countDown();
 		});
 		latch1.await();
+	}
+
+	@Test
+	public void cacheTest() throws InterruptedException {
+		AsyncCacheMapper.CachedDataProvider<String> cache = AsyncCacheMapper.create(AsyncStringValueMapper.mongoDb(this.provider));
+
+		assertNull(cache.get("foo"));// Should be null before it's cached
+
+		CountDownLatch latch = new CountDownLatch(1);
+		cache.get("foo", s -> {
+			assertNotNull(s);
+			latch.countDown();
+		});
+		latch.await();
+
+		assertNotNull(cache.get("foo"));// Should exist after caching
 	}
 
 }

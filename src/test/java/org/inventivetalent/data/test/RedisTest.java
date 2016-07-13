@@ -2,6 +2,7 @@ package org.inventivetalent.data.test;
 
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
+import org.inventivetalent.data.mapper.AsyncCacheMapper;
 import org.inventivetalent.data.mapper.AsyncStringValueMapper;
 import org.inventivetalent.data.redis.RedisDataProvider;
 import org.testng.annotations.Test;
@@ -12,8 +13,9 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
+import static org.testng.Assert.assertNull;
 
-@Test(enabled = false)
+@Test
 public class RedisTest extends AbstractKeyValueTest {
 
 	private RedisDataProvider provider;
@@ -96,5 +98,22 @@ public class RedisTest extends AbstractKeyValueTest {
 			latch1.countDown();
 		});
 	}
+
+	@Test
+	public void cacheTest() throws InterruptedException {
+		AsyncCacheMapper.CachedDataProvider<String> cache = AsyncCacheMapper.create(AsyncStringValueMapper.redis(this.provider));
+
+		assertNull(cache.get("foo"));// Should be null before it's cached
+
+		CountDownLatch latch = new CountDownLatch(1);
+		cache.get("foo", s -> {
+			assertNotNull(s);
+			latch.countDown();
+		});
+		latch.await();
+
+		assertNotNull(cache.get("foo"));// Should exist after caching
+	}
+
 
 }

@@ -49,6 +49,13 @@
             <scope>test</scope>
         </dependency>
 
+        <!-- Cache -->
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>19.0</version>
+        </dependency>
+
         <!-- MongoDB -->
         <dependency>
             <groupId>org.mongodb</groupId>
