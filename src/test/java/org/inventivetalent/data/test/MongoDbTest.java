@@ -12,6 +12,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.testng.Assert.*;
 
+@Test(enabled = false)
 public class MongoDbTest extends AbstractKeyValueTest {
 
 	private MongoDbDataProvider provider;
@@ -21,7 +22,7 @@ public class MongoDbTest extends AbstractKeyValueTest {
 		this.provider = new MongoDbDataProvider("192.168.178.34", 27017, "", new char[0], null, "data_test", "c1");
 	}
 
-	@Test(enabled = false)
+	@Test
 	public void putTest() throws InterruptedException {
 		CountDownLatch latch = new CountDownLatch(keys.size());
 
@@ -42,8 +43,7 @@ public class MongoDbTest extends AbstractKeyValueTest {
 		latch.await();
 	}
 
-	@Test(enabled = false,
-		  dependsOnMethods = { "putTest" })
+	@Test(dependsOnMethods = { "putTest" })
 	public void getTest() throws InterruptedException {
 		CountDownLatch latch = new CountDownLatch(keys.size());
 
@@ -60,7 +60,7 @@ public class MongoDbTest extends AbstractKeyValueTest {
 		latch.await();
 	}
 
-	@Test(enabled = false)
+	@Test
 	public void stringMapperTest() throws InterruptedException {
 		AsyncDataProvider<String> stringProvider = AsyncStringValueMapper.mongoDb(this.provider);
 

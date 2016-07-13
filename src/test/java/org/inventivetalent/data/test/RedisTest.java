@@ -13,6 +13,7 @@ import java.util.concurrent.CountDownLatch;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
 
+@Test(enabled = false)
 public class RedisTest extends AbstractKeyValueTest {
 
 	private RedisDataProvider provider;
@@ -24,7 +25,7 @@ public class RedisTest extends AbstractKeyValueTest {
 		this.provider = new RedisDataProvider(jedis);
 	}
 
-	@Test(enabled = false)
+	@Test
 	public void putTest() throws InterruptedException {
 		CountDownLatch latch = new CountDownLatch(keys.size());
 
@@ -43,8 +44,7 @@ public class RedisTest extends AbstractKeyValueTest {
 		latch.await();
 	}
 
-	@Test(enabled = false,
-		  dependsOnMethods = { "putTest" })
+	@Test(dependsOnMethods = { "putTest" })
 	public void getTest() throws InterruptedException {
 		CountDownLatch latch = new CountDownLatch(keys.size());
 
@@ -59,7 +59,6 @@ public class RedisTest extends AbstractKeyValueTest {
 
 		latch.await();
 	}
-
 
 	@Test
 	public void stringMapperTest() throws InterruptedException {
