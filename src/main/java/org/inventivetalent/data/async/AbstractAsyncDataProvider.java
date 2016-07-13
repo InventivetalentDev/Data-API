@@ -22,4 +22,7 @@ public abstract class AbstractAsyncDataProvider<V> implements AsyncDataProvider<
 		executor.execute(runnable);
 	}
 
+	public Executor getExecutor() {
+		return executor;
+	}
 }
