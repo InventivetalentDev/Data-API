@@ -126,7 +126,7 @@ public class AsyncJsonValueMapper {
 		};
 	}
 
-	public static <B extends KeyValueBean> AsyncDataProvider<JsonObject> ebean(EbeanDataProvider<B> provider,BeanProvider<B> beanProvider) {
+	public static <B extends KeyValueBean> AsyncDataProvider<JsonObject> ebean(EbeanDataProvider<B> provider, BeanProvider<B> beanProvider) {
 		return new AsyncDataProvider<JsonObject>() {
 
 			final JsonParser parser = new JsonParser();
@@ -156,7 +156,7 @@ public class AsyncJsonValueMapper {
 					@Nonnull
 					@Override
 					public B provide() {
-						return  createBean(key, valueCallable.provide().toString());
+						return createBean(key, valueCallable.provide().toString());
 					}
 				});
 			}
@@ -188,7 +188,7 @@ public class AsyncJsonValueMapper {
 
 			@Override
 			public void get(@Nonnull String key, @Nonnull DataCallback<JsonObject> callback) {
-				provider.get(key, keyValueBean -> callback.provide(parser.parse(keyValueBean.getValue()).getAsJsonObject()));
+				provider.get(key, keyValueBean -> callback.provide(keyValueBean != null ? parser.parse(keyValueBean.getValue()).getAsJsonObject() : null));
 			}
 
 			@Override
