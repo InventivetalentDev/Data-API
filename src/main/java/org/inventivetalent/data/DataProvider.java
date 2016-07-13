@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface DataProvider<V> {
 
-	void put(@Nonnull String key, @Nonnull String value);
+	void put(@Nonnull String key, @Nonnull V value);
 
 	void putAll(@Nonnull Map<String, V> map);
 
