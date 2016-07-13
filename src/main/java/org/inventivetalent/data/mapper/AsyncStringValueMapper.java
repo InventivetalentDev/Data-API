@@ -13,6 +13,7 @@ import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 public abstract class AsyncStringValueMapper {
 
@@ -22,6 +23,11 @@ public abstract class AsyncStringValueMapper {
 
 	public static AsyncDataProvider<String> mongoDb(MongoDbDataProvider provider) {
 		return new AsyncDataProvider<String>() {
+
+			@Override
+			public Executor getExecutor() {
+				return provider.getExecutor();
+			}
 
 			public JsonObject makeValue(String value) {
 				JsonObject jsonObject = new JsonObject();
@@ -123,6 +129,12 @@ public abstract class AsyncStringValueMapper {
 
 	public static AsyncDataProvider<String> ebean(EbeanDataProvider<KeyValueBean> provider) {
 		return new AsyncDataProvider<String>() {
+
+			@Override
+			public Executor getExecutor() {
+				return provider.getExecutor();
+			}
+
 			@Override
 			public void put(@Nonnull String key, @Nonnull String value) {
 				provider.put(key, new KeyValueBean(key, value));
