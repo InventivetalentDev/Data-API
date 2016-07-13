@@ -42,11 +42,11 @@ public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 		this.keyPattern = keyPattern;
 	}
 
-	private String formatKey(String key) {
+	protected String formatKey(String key) {
 		return String.format(this.keyFormat, key);
 	}
 
-	private String extractKey(String key) {
+	protected String extractKey(String key) {
 		return key.replaceAll(this.keyPattern, "$1");
 	}
 
