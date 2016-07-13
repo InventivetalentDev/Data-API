@@ -25,6 +25,11 @@ public abstract class AsyncStringValueMapper {
 		return new AsyncDataProvider<String>() {
 
 			@Override
+			public void execute(Runnable runnable) {
+				provider.execute(runnable);
+			}
+
+			@Override
 			public Executor getExecutor() {
 				return provider.getExecutor();
 			}
@@ -129,6 +134,11 @@ public abstract class AsyncStringValueMapper {
 
 	public static AsyncDataProvider<String> ebean(EbeanDataProvider<KeyValueBean> provider) {
 		return new AsyncDataProvider<String>() {
+
+			@Override
+			public void execute(Runnable runnable) {
+				provider.execute(runnable);
+			}
 
 			@Override
 			public Executor getExecutor() {
