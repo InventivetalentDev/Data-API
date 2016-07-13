@@ -61,7 +61,7 @@ public class AsyncCacheMapper {
 
 		@Override
 		public void put(@Nonnull String key, @Nonnull DataCallable<V> valueCallable) {
-			provider.getExecutor().execute(() -> {
+			provider.execute(() -> {
 				V value = valueCallable.provide();
 				cache.put(key, value);
 				provider.put(key, value);
