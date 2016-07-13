@@ -3,6 +3,7 @@ package org.inventivetalent.data.async;
 import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
 public interface AsyncDataProvider<V> {
 
@@ -28,4 +29,7 @@ public interface AsyncDataProvider<V> {
 
 	void size(@Nonnull DataCallback<Integer> callback);
 
+	default Executor getExecutor() {
+		return null;
+	}
 }
