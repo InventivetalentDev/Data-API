@@ -54,13 +54,11 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 
 			entry = value;
 			entry.setKey(key);
-			if (id != -1) {
-				entry.setId(id);
-				entry.setVersion(version);
-			}
 			if (!exists) {
 				getDatabase().save(entry);
 			} else {
+				entry.setId(id);
+				entry.setVersion(version);
 				getDatabase().update(entry);
 			}
 		});
