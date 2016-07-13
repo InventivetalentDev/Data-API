@@ -43,8 +43,8 @@ public class MongoDbDataProvider extends AbstractAsyncDataProvider<JsonObject> {
 
 	public MongoDbDataProvider(Executor executor, String host, int port, String user, char[] pass, String authDatabase, String database, String collection) {
 		super(executor);
-		MongoCredential credential = MongoCredential.createScramSha1Credential(user, authDatabase, pass);
-		this.client = new MongoClient(new ServerAddress(host, port), Collections.singletonList(credential));
+		MongoCredential credential = user != null && pass != null && authDatabase != null ? MongoCredential.createScramSha1Credential(user, authDatabase, pass) : null;
+		this.client = credential != null ? new MongoClient(new ServerAddress(host, port), Collections.singletonList(credential)) : new MongoClient(new ServerAddress(host, port));
 		this.collection = this.client.getDatabase(database).getCollection(collection);
 	}
 
