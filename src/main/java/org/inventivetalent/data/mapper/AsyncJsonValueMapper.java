@@ -11,7 +11,6 @@ import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.inventivetalent.data.redis.RedisDataProvider;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -106,19 +105,16 @@ public class AsyncJsonValueMapper {
 
 			@Override
 			public void entries(@Nonnull DataCallback<Map<String, JsonObject>> callback) {
-				provider.entries(new DataCallback<Map<String, String>>() {
-					@Override
-					public void provide(@Nullable Map<String, String> map) {
-						Map<String, JsonObject> jsonMap = new HashMap<>();
-						if (map == null) {
-							callback.provide(jsonMap);
-							return;
-						}
-						for (Map.Entry<String, String> entry : map.entrySet()) {
-							jsonMap.put(entry.getKey(), parser.parse(entry.getValue()).getAsJsonObject());
-						}
+				provider.entries(map -> {
+					Map<String, JsonObject> jsonMap = new HashMap<>();
+					if (map == null) {
 						callback.provide(jsonMap);
+						return;
 					}
+					for (Map.Entry<String, String> entry : map.entrySet()) {
+						jsonMap.put(entry.getKey(), parser.parse(entry.getValue()).getAsJsonObject());
+					}
+					callback.provide(jsonMap);
 				});
 			}
 
