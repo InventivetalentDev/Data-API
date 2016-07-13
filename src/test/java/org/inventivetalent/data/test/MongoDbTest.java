@@ -12,7 +12,7 @@ import java.util.concurrent.CountDownLatch;
 
 import static org.testng.Assert.*;
 
-@Test(enabled = false)
+@Test
 public class MongoDbTest extends AbstractKeyValueTest {
 
 	private MongoDbDataProvider provider;
@@ -95,6 +95,7 @@ public class MongoDbTest extends AbstractKeyValueTest {
 			assertEquals(s, "bar1");
 			latch1.countDown();
 		});
+		latch1.await();
 	}
 
 }
