@@ -15,6 +15,7 @@ public abstract class AbstractAsyncDataProvider<V> implements AsyncDataProvider<
 		this.executor = executor;
 	}
 
+	@Override
 	public void execute(Runnable runnable) {
 		if (executor == null) {
 			throw new IllegalStateException("Missing executor");
@@ -22,6 +23,7 @@ public abstract class AbstractAsyncDataProvider<V> implements AsyncDataProvider<
 		executor.execute(runnable);
 	}
 
+	@Override
 	public Executor getExecutor() {
 		return executor;
 	}

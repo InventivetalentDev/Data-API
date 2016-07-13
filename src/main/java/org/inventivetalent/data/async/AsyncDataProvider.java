@@ -29,6 +29,10 @@ public interface AsyncDataProvider<V> {
 
 	void size(@Nonnull DataCallback<Integer> callback);
 
+	default void execute(Runnable runnable) {
+		getExecutor().execute(runnable);
+	}
+
 	default Executor getExecutor() {
 		return null;
 	}
