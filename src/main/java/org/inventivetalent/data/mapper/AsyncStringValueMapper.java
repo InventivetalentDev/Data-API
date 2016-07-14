@@ -9,6 +9,7 @@ import org.inventivetalent.data.ebean.EbeanDataProvider;
 import org.inventivetalent.data.ebean.KeyValueBean;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.inventivetalent.data.redis.RedisDataProvider;
+import org.inventivetalent.data.sql.SQLDataProvider;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -19,6 +20,10 @@ import java.util.concurrent.Executor;
 public abstract class AsyncStringValueMapper {
 
 	public static AsyncDataProvider<String> redis(RedisDataProvider provider) {
+		return provider;
+	}
+
+	public static AsyncDataProvider<String> sql(SQLDataProvider provider) {
 		return provider;
 	}
 
@@ -133,7 +138,7 @@ public abstract class AsyncStringValueMapper {
 		};
 	}
 
-	public static <B extends KeyValueBean> AsyncDataProvider<String> ebean(EbeanDataProvider<B> provider,BeanProvider<B> beanProvider) {
+	public static <B extends KeyValueBean> AsyncDataProvider<String> ebean(EbeanDataProvider<B> provider, BeanProvider<B> beanProvider) {
 		return new AsyncDataProvider<String>() {
 
 			@Override
@@ -146,7 +151,7 @@ public abstract class AsyncStringValueMapper {
 				return provider.getExecutor();
 			}
 
-			B createBean(String key,String value) {
+			B createBean(String key, String value) {
 				return beanProvider.provide(key, value);
 			}
 
