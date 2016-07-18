@@ -116,7 +116,8 @@ public class AsyncCacheMapper {
 
 		@Override
 		public boolean contains(@Nonnull String key) {
-			return cache.getIfPresent(key) != null;
+			Optional<V> value = cache.getIfPresent(key);
+			return value != null && value.isPresent();
 		}
 
 		@Override
