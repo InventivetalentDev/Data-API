@@ -1,6 +1,7 @@
 package org.inventivetalent.data.file;
 
 import org.inventivetalent.data.DataProvider;
+import org.inventivetalent.data.async.AbstractAsyncDataProvider;
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
@@ -12,12 +13,18 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
 
-public class FileDataProvider implements AsyncDataProvider<String>, DataProvider<String> {
+public class FileDataProvider extends AbstractAsyncDataProvider<String> implements AsyncDataProvider<String>, DataProvider<String> {
 
 	private final File dir;
 
 	public FileDataProvider(File dir) {
+		this.dir = dir;
+	}
+
+	public FileDataProvider(Executor executor, File dir) {
+		super(executor);
 		this.dir = dir;
 	}
 
