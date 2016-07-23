@@ -7,6 +7,7 @@ import org.inventivetalent.data.async.DataCallback;
 import org.inventivetalent.data.ebean.BeanProvider;
 import org.inventivetalent.data.ebean.EbeanDataProvider;
 import org.inventivetalent.data.ebean.KeyValueBean;
+import org.inventivetalent.data.file.FileDataProvider;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.inventivetalent.data.redis.RedisDataProvider;
 import org.inventivetalent.data.sql.SQLDataProvider;
@@ -24,6 +25,10 @@ public abstract class AsyncStringValueMapper {
 	}
 
 	public static AsyncDataProvider<String> sql(SQLDataProvider provider) {
+		return provider;
+	}
+
+	public static AsyncDataProvider<String> file(FileDataProvider provider) {
 		return provider;
 	}
 
