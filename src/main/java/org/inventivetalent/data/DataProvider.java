@@ -1,30 +1,29 @@
 package org.inventivetalent.data;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import lombok.NonNull;
+
 import java.util.Collection;
 import java.util.Map;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public interface DataProvider<V> {
 
-	void put(@Nonnull String key, @Nonnull V value);
+	void put(@NonNull String key, @NonNull V value);
 
-	void putAll(@Nonnull Map<String, V> map);
+	void putAll(@NonNull Map<String, V> map);
 
-	@Nullable
-	V get(@Nonnull String key);
+	V get(@NonNull String key);
 
-	boolean contains(@Nonnull String key);
+	boolean contains(@NonNull String key);
 
-	void remove(@Nonnull String key);
+	void remove(@NonNull String key);
 
-	@Nullable
-	V getAndRemove(@Nonnull String key);
+	V getAndRemove(@NonNull String key);
 
-	@Nonnull
+	@NonNull
 	Collection<String> keys();
 
-	@Nonnull
+	@NonNull
 	Map<String, V> entries();
 
 	int size();

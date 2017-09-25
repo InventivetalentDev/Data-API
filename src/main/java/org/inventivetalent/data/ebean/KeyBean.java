@@ -6,39 +6,42 @@ import javax.persistence.Id;
 import javax.persistence.Version;
 
 @Entity
+@SuppressWarnings("WeakerAccess")
 public class KeyBean {
 
 
+	@Id
+	int id;
+	@Version
+	long version;
 
-	@Id      int  id;
-	@Version long version;
-
-	@Column(unique = true) String key;
+	@Column(unique = true)
+	String key;
 
 	public KeyBean() {
-	}
-
-	public void setId(int id) {
-		this.id = id;
 	}
 
 	public int getId() {
 		return id;
 	}
 
-	public void setVersion(long version) {
-		this.version = version;
+	public void setId(int id) {
+		this.id = id;
 	}
 
 	public long getVersion() {
 		return version;
 	}
 
-	public void setKey(String key) {
-		this.key = key;
+	public void setVersion(long version) {
+		this.version = version;
 	}
 
 	public String getKey() {
 		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
 	}
 }

@@ -3,6 +3,7 @@ package org.inventivetalent.data.async;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 
+@SuppressWarnings("WeakerAccess")
 public abstract class AbstractAsyncDataProvider<V> implements AsyncDataProvider<V> {
 
 	private Executor executor;

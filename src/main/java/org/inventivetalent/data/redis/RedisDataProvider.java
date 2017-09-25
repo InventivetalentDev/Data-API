@@ -1,18 +1,19 @@
 package org.inventivetalent.data.redis;
 
+import lombok.NonNull;
 import org.inventivetalent.data.async.AbstractAsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
 import redis.clients.jedis.Jedis;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 
-	private final Jedis  jedis;
+	private final Jedis jedis;
 	private final String keyFormat;
 	private final String keyPattern;
 
@@ -51,23 +52,23 @@ public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 	}
 
 	@Override
-	public void put(@Nonnull String key, @Nonnull String value) {
+	public void put(@NonNull String key, @NonNull String value) {
 		execute(() -> jedis.set(formatKey(key), value));
 	}
 
 	@Override
-	public void put(@Nonnull String key, @Nonnull DataCallable<String> valueCallable) {
+	public void put(@NonNull String key, @NonNull DataCallable<String> valueCallable) {
 		execute(() -> jedis.set(formatKey(key), valueCallable.provide()));
 	}
 
 	@Override
-	public void putAll(@Nonnull Map<String, String> map) {
+	public void putAll(@NonNull Map<String, String> map) {
 		String[] keysValues = createKeysValues(map);
 		execute(() -> jedis.mset(keysValues));
 	}
 
 	@Override
-	public void putAll(@Nonnull DataCallable<Map<String, String>> mapCallable) {
+	public void putAll(@NonNull DataCallable<Map<String, String>> mapCallable) {
 		execute(() -> {
 			Map<String, String> map = mapCallable.provide();
 			String[] keysValues = createKeysValues(map);
@@ -86,17 +87,17 @@ public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 	}
 
 	@Override
-	public void get(@Nonnull String key, @Nonnull DataCallback<String> callback) {
+	public void get(@NonNull String key, @NonNull DataCallback<String> callback) {
 		execute(() -> callback.provide(jedis.get(formatKey(key))));
 	}
 
 	@Override
-	public void contains(@Nonnull String key, @Nonnull DataCallback<Boolean> callback) {
+	public void contains(@NonNull String key, @NonNull DataCallback<Boolean> callback) {
 		execute(() -> callback.provide(jedis.exists(formatKey(key))));
 	}
 
 	@Override
-	public void remove(@Nonnull String key, @Nonnull DataCallback<String> callback) {
+	public void remove(@NonNull String key, @NonNull DataCallback<String> callback) {
 		execute(() -> {
 			String formattedKey = formatKey(key);
 			String value = jedis.get(formattedKey);
@@ -106,12 +107,12 @@ public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 	}
 
 	@Override
-	public void remove(@Nonnull String key) {
+	public void remove(@NonNull String key) {
 		execute(() -> jedis.del(formatKey(key)));
 	}
 
 	@Override
-	public void keys(@Nonnull DataCallback<Collection<String>> callback) {
+	public void keys(@NonNull DataCallback<Collection<String>> callback) {
 		execute(() -> {
 			Set<String> rawKeys = jedis.keys(formatKey("*"));
 			Set<String> keys = rawKeys.stream().map(this::extractKey).collect(Collectors.toSet());
@@ -120,7 +121,7 @@ public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 	}
 
 	@Override
-	public void entries(@Nonnull DataCallback<Map<String, String>> callback) {
+	public void entries(@NonNull DataCallback<Map<String, String>> callback) {
 		execute(() -> {
 			//TODO: make this more efficient
 			Set<String> rawKeys = jedis.keys(formatKey("*"));
@@ -135,7 +136,7 @@ public class RedisDataProvider extends AbstractAsyncDataProvider<String> {
 	}
 
 	@Override
-	public void size(@Nonnull DataCallback<Integer> callback) {
+	public void size(@NonNull DataCallback<Integer> callback) {
 		execute(() -> {
 			Set<String> rawKeys = jedis.keys(formatKey("*"));
 			callback.provide(rawKeys.size());

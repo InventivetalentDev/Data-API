@@ -1,6 +1,7 @@
 package org.inventivetalent.data.mapper;
 
 import com.google.gson.JsonObject;
+import lombok.NonNull;
 import org.inventivetalent.data.async.AsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
@@ -11,12 +12,12 @@ import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.inventivetalent.data.redis.RedisDataProvider;
 import org.inventivetalent.data.sql.SQLDataProvider;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public abstract class AsyncStringValueMapper {
 
 	public static AsyncDataProvider<String> redis(RedisDataProvider provider) {
@@ -51,23 +52,17 @@ public abstract class AsyncStringValueMapper {
 			}
 
 			@Override
-			public void put(@Nonnull String key, @Nonnull String value) {
+			public void put(@NonNull String key, @NonNull String value) {
 				provider.put(key, makeValue(value));
 			}
 
 			@Override
-			public void put(@Nonnull String key, @Nonnull DataCallable<String> valueCallable) {
-				provider.put(key, new DataCallable<JsonObject>() {
-					@Nonnull
-					@Override
-					public JsonObject provide() {
-						return makeValue(valueCallable.provide());
-					}
-				});
+			public void put(@NonNull String key, @NonNull DataCallable<String> valueCallable) {
+				provider.put(key, () -> makeValue(valueCallable.provide()));
 			}
 
 			@Override
-			public void putAll(@Nonnull Map<String, String> map) {
+			public void putAll(@NonNull Map<String, String> map) {
 				Map<String, JsonObject> jsonMap = new HashMap<>();
 				for (Map.Entry<String, String> entry : map.entrySet()) {
 					jsonMap.put(entry.getKey(), makeValue(entry.getValue()));
@@ -76,48 +71,44 @@ public abstract class AsyncStringValueMapper {
 			}
 
 			@Override
-			public void putAll(@Nonnull DataCallable<Map<String, String>> mapCallable) {
-				provider.putAll(new DataCallable<Map<String, JsonObject>>() {
-					@Nonnull
-					@Override
-					public Map<String, JsonObject> provide() {
-						Map<String, String> map = mapCallable.provide();
-						Map<String, JsonObject> jsonMap = new HashMap<>();
-						for (Map.Entry<String, String> entry : map.entrySet()) {
-							jsonMap.put(entry.getKey(), makeValue(entry.getValue()));
-						}
-						return jsonMap;
-					}
-				});
+			public void putAll(@NonNull DataCallable<Map<String, String>> mapCallable) {
+				provider.putAll(() -> {
+                    Map<String, String> map = mapCallable.provide();
+                    Map<String, JsonObject> jsonMap = new HashMap<>();
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        jsonMap.put(entry.getKey(), makeValue(entry.getValue()));
+                    }
+                    return jsonMap;
+                });
 			}
 
 			@Override
-			public void get(@Nonnull String key, @Nonnull DataCallback<String> callback) {
+			public void get(@NonNull String key, @NonNull DataCallback<String> callback) {
 				provider.get(key, jsonObject -> callback.provide(getValue(jsonObject)));
 			}
 
 			@Override
-			public void contains(@Nonnull String key, @Nonnull DataCallback<Boolean> callback) {
+			public void contains(@NonNull String key, @NonNull DataCallback<Boolean> callback) {
 				provider.contains(key, callback);
 			}
 
 			@Override
-			public void remove(@Nonnull String key, @Nonnull DataCallback<String> callback) {
+			public void remove(@NonNull String key, @NonNull DataCallback<String> callback) {
 				provider.remove(key, jsonObject -> callback.provide(getValue(jsonObject)));
 			}
 
 			@Override
-			public void remove(@Nonnull String key) {
+			public void remove(@NonNull String key) {
 				provider.remove(key);
 			}
 
 			@Override
-			public void keys(@Nonnull DataCallback<Collection<String>> callback) {
+			public void keys(@NonNull DataCallback<Collection<String>> callback) {
 				provider.keys(callback);
 			}
 
 			@Override
-			public void entries(@Nonnull DataCallback<Map<String, String>> callback) {
+			public void entries(@NonNull DataCallback<Map<String, String>> callback) {
 				provider.entries(stringJsonObjectMap -> {
 					Map<String, String> stringMap = new HashMap<>();
 					if (stringJsonObjectMap == null) {
@@ -132,7 +123,7 @@ public abstract class AsyncStringValueMapper {
 			}
 
 			@Override
-			public void size(@Nonnull DataCallback<Integer> callback) {
+			public void size(@NonNull DataCallback<Integer> callback) {
 				provider.size(callback);
 			}
 		};
@@ -156,23 +147,17 @@ public abstract class AsyncStringValueMapper {
 			}
 
 			@Override
-			public void put(@Nonnull String key, @Nonnull String value) {
+			public void put(@NonNull String key, @NonNull String value) {
 				provider.put(key, createBean(key, value));
 			}
 
 			@Override
-			public void put(@Nonnull String key, @Nonnull DataCallable<String> valueCallable) {
-				provider.put(key, new DataCallable<B>() {
-					@Nonnull
-					@Override
-					public B provide() {
-						return createBean(key, valueCallable.provide());
-					}
-				});
+			public void put(@NonNull String key, @NonNull DataCallable<String> valueCallable) {
+				provider.put(key, () -> createBean(key, valueCallable.provide()));
 			}
 
 			@Override
-			public void putAll(@Nonnull Map<String, String> map) {
+			public void putAll(@NonNull Map<String, String> map) {
 				Map<String, B> beanMap = new HashMap<>();
 				for (Map.Entry<String, String> entry : map.entrySet()) {
 					beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue()));
@@ -181,48 +166,44 @@ public abstract class AsyncStringValueMapper {
 			}
 
 			@Override
-			public void putAll(@Nonnull DataCallable<Map<String, String>> mapCallable) {
-				provider.putAll(new DataCallable<Map<String, B>>() {
-					@Nonnull
-					@Override
-					public Map<String, B> provide() {
-						Map<String, String> map = mapCallable.provide();
-						Map<String, B> beanMap = new HashMap<>();
-						for (Map.Entry<String, String> entry : map.entrySet()) {
-							beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue()));
-						}
-						return beanMap;
-					}
-				});
+			public void putAll(@NonNull DataCallable<Map<String, String>> mapCallable) {
+				provider.putAll(() -> {
+                    Map<String, String> map = mapCallable.provide();
+                    Map<String, B> beanMap = new HashMap<>();
+                    for (Map.Entry<String, String> entry : map.entrySet()) {
+                        beanMap.put(entry.getKey(), createBean(entry.getKey(), entry.getValue()));
+                    }
+                    return beanMap;
+                });
 			}
 
 			@Override
-			public void get(@Nonnull String key, @Nonnull DataCallback<String> callback) {
+			public void get(@NonNull String key, @NonNull DataCallback<String> callback) {
 				provider.get(key, keyValueBean -> callback.provide(keyValueBean != null ? keyValueBean.getValue() : null));
 			}
 
 			@Override
-			public void contains(@Nonnull String key, @Nonnull DataCallback<Boolean> callback) {
+			public void contains(@NonNull String key, @NonNull DataCallback<Boolean> callback) {
 				provider.contains(key, callback);
 			}
 
 			@Override
-			public void remove(@Nonnull String key, @Nonnull DataCallback<String> callback) {
+			public void remove(@NonNull String key, @NonNull DataCallback<String> callback) {
 				provider.remove(key, keyValueBean -> callback.provide(keyValueBean != null ? keyValueBean.getValue() : null));
 			}
 
 			@Override
-			public void remove(@Nonnull String key) {
+			public void remove(@NonNull String key) {
 				provider.remove(key);
 			}
 
 			@Override
-			public void keys(@Nonnull DataCallback<Collection<String>> callback) {
+			public void keys(@NonNull DataCallback<Collection<String>> callback) {
 				provider.keys(callback);
 			}
 
 			@Override
-			public void entries(@Nonnull DataCallback<Map<String, String>> callback) {
+			public void entries(@NonNull DataCallback<Map<String, String>> callback) {
 				provider.entries(stringBMap -> {
 					Map<String, String> stringMap = new HashMap<>();
 					if (stringBMap == null) {
@@ -237,7 +218,7 @@ public abstract class AsyncStringValueMapper {
 			}
 
 			@Override
-			public void size(@Nonnull DataCallback<Integer> callback) {
+			public void size(@NonNull DataCallback<Integer> callback) {
 				provider.size(callback);
 			}
 		};

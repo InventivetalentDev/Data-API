@@ -1,12 +1,12 @@
 package org.inventivetalent.data.ebean;
 
 import com.avaje.ebean.EbeanServer;
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.inventivetalent.data.async.AbstractAsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
 
-import javax.annotation.Nonnull;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -14,10 +14,11 @@ import java.util.Set;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvider<V> {
 
 	private final EbeanServer database;
-	private final Class<V>    beanClass;
+	private final Class<V> beanClass;
 
 	public EbeanDataProvider(EbeanServer database, Class<V> beanClass) {
 		this.database = database;
@@ -40,7 +41,7 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void put(@Nonnull String key, @Nonnull V value) {
+	public void put(@NonNull String key, @NonNull V value) {
 		execute(() -> {
 			V entry;
 			boolean exists = (entry = getDatabase().find(beanClass).where().eq("key", key).findUnique()) != null;
@@ -65,10 +66,10 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void put(@Nonnull String key, @Nonnull DataCallable<V> valueCallable) {
+	public void put(@NonNull String key, @NonNull DataCallable<V> valueCallable) {
 		execute(() -> {
 			V entry;
-			boolean exists = (entry = getDatabase().find(beanClass).where().eq("key", key).findUnique()) != null;
+			boolean exists = getDatabase().find(beanClass).where().eq("key", key).findUnique() != null;
 			entry = valueCallable.provide();
 			entry.setKey(key);
 			if (!exists) {
@@ -80,11 +81,11 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void putAll(@Nonnull Map<String, V> map) {
+	public void putAll(@NonNull Map<String, V> map) {
 		execute(() -> {
 			for (Map.Entry<String, V> mEntry : map.entrySet()) {
 				V entry;
-				boolean exists = (entry = getDatabase().find(beanClass).where().eq("key", mEntry.getKey()).findUnique()) != null;
+				boolean exists = getDatabase().find(beanClass).where().eq("key", mEntry.getKey()).findUnique() != null;
 				entry = mEntry.getValue();
 				entry.setKey(mEntry.getKey());
 				if (!exists) {
@@ -97,11 +98,11 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void putAll(@Nonnull DataCallable<Map<String, V>> mapCallable) {
+	public void putAll(@NonNull DataCallable<Map<String, V>> mapCallable) {
 		execute(() -> {
 			for (Map.Entry<String, V> mEntry : mapCallable.provide().entrySet()) {
 				V entry;
-				boolean exists = (entry = getDatabase().find(beanClass).where().eq("key", mEntry.getKey()).findUnique()) != null;
+				boolean exists = getDatabase().find(beanClass).where().eq("key", mEntry.getKey()).findUnique() != null;
 				entry = mEntry.getValue();
 				entry.setKey(mEntry.getKey());
 				if (!exists) {
@@ -114,34 +115,38 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void get(@Nonnull String key, @Nonnull DataCallback<V> callback) {
+	public void get(@NonNull String key, @NonNull DataCallback<V> callback) {
 		execute(() -> callback.provide(getDatabase().find(beanClass).where().eq("key", key).findUnique()));
 	}
 
 	@Override
-	public void contains(@Nonnull String key, @Nonnull DataCallback<Boolean> callback) {
+	public void contains(@NonNull String key, @NonNull DataCallback<Boolean> callback) {
 		execute(() -> callback.provide(getDatabase().find(beanClass).where().eq("key", key).findRowCount() > 0));
 	}
 
 	@Override
-	public void remove(@Nonnull String key, @Nonnull DataCallback<V> callback) {
+	public void remove(@NonNull String key, @NonNull DataCallback<V> callback) {
 		execute(() -> {
 			V value = getDatabase().find(beanClass).where().eq("key", key).findUnique();
-			if (value != null) { getDatabase().delete(value); }
+			if (value != null) {
+				getDatabase().delete(value);
+			}
 			callback.provide(value);
 		});
 	}
 
 	@Override
-	public void remove(@Nonnull String key) {
+	public void remove(@NonNull String key) {
 		execute(() -> {
 			V value = getDatabase().find(beanClass).where().eq("key", key).findUnique();
-			if (value != null) { getDatabase().delete(value); }
+			if (value != null) {
+				getDatabase().delete(value);
+			}
 		});
 	}
 
 	@Override
-	public void keys(@Nonnull DataCallback<Collection<String>> callback) {
+	public void keys(@NonNull DataCallback<Collection<String>> callback) {
 		execute(() -> {
 			Set<V> entries = getDatabase().find(beanClass).select("key").findSet();
 			Set<String> keys = entries.stream().map(V::getKey).collect(Collectors.toSet());
@@ -150,7 +155,7 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void entries(@Nonnull DataCallback<Map<String, V>> callback) {
+	public void entries(@NonNull DataCallback<Map<String, V>> callback) {
 		execute(() -> {
 			Set<V> entries = getDatabase().find(beanClass).findSet();
 			Map<String, V> map = new HashMap<>();
@@ -162,7 +167,7 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 	}
 
 	@Override
-	public void size(@Nonnull DataCallback<Integer> callback) {
+	public void size(@NonNull DataCallback<Integer> callback) {
 		execute(() -> callback.provide(getDatabase().find(beanClass).findRowCount()));
 	}
 }

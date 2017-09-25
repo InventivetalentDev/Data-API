@@ -1,10 +1,10 @@
 package org.inventivetalent.data.async;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
 
 public interface DataCallable<V> {
 
-	@Nonnull
+	@NonNull
 	V provide();
 
 }
