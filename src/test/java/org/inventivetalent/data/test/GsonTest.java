@@ -2,9 +2,9 @@ package org.inventivetalent.data.test;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 public class GsonTest {
 

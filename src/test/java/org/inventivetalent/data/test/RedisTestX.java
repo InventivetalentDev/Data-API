@@ -1,21 +1,16 @@
 package org.inventivetalent.data.test;
 
 import org.inventivetalent.data.async.AsyncDataProvider;
-import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.mapper.AsyncCacheMapper;
 import org.inventivetalent.data.mapper.AsyncStringValueMapper;
 import org.inventivetalent.data.redis.RedisDataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
 import redis.clients.jedis.Jedis;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.CountDownLatch;
 
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertNotNull;
-import static org.testng.Assert.assertNull;
+import static org.junit.Assert.*;
 
-@Test
 public class RedisTestX extends AbstractKeyValueTest {
 
 	private RedisDataProvider provider;
@@ -33,20 +28,16 @@ public class RedisTestX extends AbstractKeyValueTest {
 
 		for (int i = 0; i < keys.size(); i++) {
 			final int finalI = i;
-			provider.put(keys.get(i), new DataCallable<String>() {
-				@Nonnull
-				@Override
-				public String provide() {
-					latch.countDown();
-					return values.get(finalI);
-				}
+			provider.put(keys.get(i), () -> {
+				latch.countDown();
+				return values.get(finalI);
 			});
 		}
 
 		latch.await();
 	}
 
-	@Test(dependsOnMethods = { "putTest" })
+	@Test
 	public void getTest() throws InterruptedException {
 		CountDownLatch latch = new CountDownLatch(keys.size());
 
@@ -68,21 +59,13 @@ public class RedisTestX extends AbstractKeyValueTest {
 
 		CountDownLatch latch = new CountDownLatch(2);
 
-		stringProvider.put("foo", new DataCallable<String>() {
-			@Nonnull
-			@Override
-			public String provide() {
-				latch.countDown();
-				return "bar";
-			}
+		stringProvider.put("foo", () -> {
+			latch.countDown();
+			return "bar";
 		});
-		stringProvider.put("foo1", new DataCallable<String>() {
-			@Nonnull
-			@Override
-			public String provide() {
-				latch.countDown();
-				return "bar1";
-			}
+		stringProvider.put("foo1", () -> {
+			latch.countDown();
+			return "bar1";
 		});
 		latch.await();
 

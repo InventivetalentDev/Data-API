@@ -6,21 +6,22 @@ import com.mongodb.MongoCredential;
 import com.mongodb.ServerAddress;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.model.UpdateOptions;
+import lombok.NonNull;
 import org.bson.Document;
 import org.inventivetalent.data.async.AbstractAsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
 
-import javax.annotation.Nonnull;
 import java.util.*;
 import java.util.concurrent.Executor;
 import java.util.stream.Collectors;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class MongoDbDataProvider extends AbstractAsyncDataProvider<JsonObject> {
 
 	private static final UpdateOptions UPSERT_OPTIONS = new UpdateOptions().upsert(true);
 
-	private final MongoClient               client;
+	private final MongoClient client;
 	private final MongoCollection<Document> collection;
 	private String keyField = "_id";
 
@@ -58,12 +59,12 @@ public class MongoDbDataProvider extends AbstractAsyncDataProvider<JsonObject> {
 	}
 
 	@Override
-	public void put(@Nonnull String key, @Nonnull JsonObject value) {
+	public void put(@NonNull String key, @NonNull JsonObject value) {
 		execute(() -> this.collection.updateOne(new Document(this.keyField, key).append(this.keyField, key), new Document("$set", DocumentParser.toDocument(value)), UPSERT_OPTIONS));
 	}
 
 	@Override
-	public void put(@Nonnull String key, @Nonnull DataCallable<JsonObject> valueCallable) {
+	public void put(@NonNull String key, @NonNull DataCallable<JsonObject> valueCallable) {
 		execute(() -> this.collection.updateOne(new Document(this.keyField, key).append(this.keyField, key), new Document("$set", DocumentParser.toDocument(valueCallable.provide())), UPSERT_OPTIONS));
 	}
 
@@ -73,39 +74,39 @@ public class MongoDbDataProvider extends AbstractAsyncDataProvider<JsonObject> {
 	 * @param map values to insert
 	 */
 	@Override
-	public void putAll(@Nonnull Map<String, JsonObject> map) {
+	public void putAll(@NonNull Map<String, JsonObject> map) {
 		List<Document> documents = map.entrySet().stream().map(entry -> DocumentParser.toDocument(entry.getValue()).append(this.keyField, entry.getKey())).collect(Collectors.toList());
 		execute(() -> this.collection.insertMany(documents));
 	}
 
 	@Override
-	public void putAll(@Nonnull DataCallable<Map<String, JsonObject>> mapCallable) {
+	public void putAll(@NonNull DataCallable<Map<String, JsonObject>> mapCallable) {
 		List<Document> documents = mapCallable.provide().entrySet().stream().map(entry -> DocumentParser.toDocument(entry.getValue()).append(this.keyField, entry.getKey())).collect(Collectors.toList());
 		execute(() -> this.collection.insertMany(documents));
 	}
 
 	@Override
-	public void get(@Nonnull String key, @Nonnull DataCallback<JsonObject> callback) {
+	public void get(@NonNull String key, @NonNull DataCallback<JsonObject> callback) {
 		execute(() -> callback.provide(DocumentParser.toJson(this.collection.find(new Document(this.keyField, key)).limit(1).first())));
 	}
 
 	@Override
-	public void contains(@Nonnull String key, @Nonnull DataCallback<Boolean> callback) {
+	public void contains(@NonNull String key, @NonNull DataCallback<Boolean> callback) {
 		execute(() -> callback.provide(this.collection.count(new Document(this.keyField, key)) > 0));
 	}
 
 	@Override
-	public void remove(@Nonnull String key, @Nonnull DataCallback<JsonObject> callback) {
+	public void remove(@NonNull String key, @NonNull DataCallback<JsonObject> callback) {
 		execute(() -> callback.provide(DocumentParser.toJson(this.collection.findOneAndDelete(new Document(this.keyField, key)))));
 	}
 
 	@Override
-	public void remove(@Nonnull String key) {
+	public void remove(@NonNull String key) {
 		execute(() -> this.collection.deleteOne(new Document(this.keyField, key)));
 	}
 
 	@Override
-	public void keys(@Nonnull DataCallback<Collection<String>> callback) {
+	public void keys(@NonNull DataCallback<Collection<String>> callback) {
 		this.entries(stringJsonObjectMap -> {
 			assert stringJsonObjectMap != null;
 			callback.provide(stringJsonObjectMap.keySet());
@@ -113,7 +114,7 @@ public class MongoDbDataProvider extends AbstractAsyncDataProvider<JsonObject> {
 	}
 
 	@Override
-	public void entries(@Nonnull DataCallback<Map<String, JsonObject>> callback) {
+	public void entries(@NonNull DataCallback<Map<String, JsonObject>> callback) {
 		execute(() -> {
 			Map<String, JsonObject> map = new HashMap<>();
 			for (Document doc : collection.find()) {
@@ -124,7 +125,7 @@ public class MongoDbDataProvider extends AbstractAsyncDataProvider<JsonObject> {
 	}
 
 	@Override
-	public void size(@Nonnull DataCallback<Integer> callback) {
+	public void size(@NonNull DataCallback<Integer> callback) {
 		execute(() -> callback.provide((int) this.collection.count()));
 	}
 }

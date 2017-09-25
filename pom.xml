@@ -6,14 +6,20 @@
 
     <groupId>org.inventivetalent</groupId>
     <artifactId>data-api</artifactId>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.2-SNAPSHOT</version>
+
+    <name>DataAPI</name>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <build>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.3</version>
+                <version>3.6.2</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -23,76 +29,63 @@
     </build>
 
     <dependencies>
+        <!-- Spigot API -->
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-api</artifactId>
+            <version>1.12.2-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
 
         <!-- General -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.6.2</version>
-        </dependency>
-        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.16.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.findbugs</groupId>
-            <artifactId>findbugs</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.6.2</version>
+            <version>1.16.16</version>
+            <scope>provided</scope>
         </dependency>
 
-        <!-- Testing -->
+        <!-- EBean -->
         <dependency>
-            <groupId>org.testng</groupId>
-            <artifactId>testng</artifactId>
-            <version>6.8</version>
-            <scope>test</scope>
-        </dependency>
-
-        <!-- Cache -->
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
+            <groupId>org.avaje</groupId>
+            <artifactId>ebean</artifactId>
+            <version>2.8.1</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- MongoDB -->
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>mongodb-driver</artifactId>
-            <version>3.0.4</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mongodb</groupId>
-            <artifactId>bson</artifactId>
-            <version>3.0.4</version>
+            <version>3.5.0</version>
+            <scope>compile</scope>
         </dependency>
 
         <!-- Redis -->
         <dependency>
             <groupId>redis.clients</groupId>
             <artifactId>jedis</artifactId>
-            <version>2.8.0</version>
+            <version>2.9.0</version>
+            <scope>compile</scope>
         </dependency>
 
-        <!-- Ebean stuff (Bukkit) -->
+        <!-- Testing -->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.9-R0.1-SNAPSHOT</version>
-        </dependency>
-
-        <!-- SQL -->
-        <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.6</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
+    <distributionManagement>
+        <repository>
+            <id>sonatype-nexus-releases</id>
+            <url>http://repo.inventivetalent.org/content/repositories/releases/</url>
+        </repository>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <url>http://repo.inventivetalent.org/content/repositories/snapshots/</url>
+        </snapshotRepository>
+    </distributionManagement>
 </project>

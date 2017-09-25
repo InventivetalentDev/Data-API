@@ -1,33 +1,34 @@
 package org.inventivetalent.data.async;
 
-import javax.annotation.Nonnull;
+import lombok.NonNull;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.concurrent.Executor;
 
 public interface AsyncDataProvider<V> {
 
-	void put(@Nonnull String key, @Nonnull V value);
+	void put(@NonNull String key, @NonNull V value);
 
-	void put(@Nonnull String key, @Nonnull DataCallable<V> valueCallable);
+	void put(@NonNull String key, @NonNull DataCallable<V> valueCallable);
 
-	void putAll(@Nonnull Map<String, V> map);
+	void putAll(@NonNull Map<String, V> map);
 
-	void putAll(@Nonnull DataCallable<Map<String, V>> mapCallable);
+	void putAll(@NonNull DataCallable<Map<String, V>> mapCallable);
 
-	void get(@Nonnull String key, @Nonnull DataCallback<V> callback);
+	void get(@NonNull String key, @NonNull DataCallback<V> callback);
 
-	void contains(@Nonnull String key, @Nonnull DataCallback<Boolean> callback);
+	void contains(@NonNull String key, @NonNull DataCallback<Boolean> callback);
 
-	void remove(@Nonnull String key, @Nonnull DataCallback<V> callback);
+	void remove(@NonNull String key, @NonNull DataCallback<V> callback);
 
-	void remove(@Nonnull String key);
+	void remove(@NonNull String key);
 
-	void keys(@Nonnull DataCallback<Collection<String>> callback);
+	void keys(@NonNull DataCallback<Collection<String>> callback);
 
-	void entries(@Nonnull DataCallback<Map<String, V>> callback);
+	void entries(@NonNull DataCallback<Map<String, V>> callback);
 
-	void size(@Nonnull DataCallback<Integer> callback);
+	void size(@NonNull DataCallback<Integer> callback);
 
 	default void execute(Runnable runnable) {
 		getExecutor().execute(runnable);

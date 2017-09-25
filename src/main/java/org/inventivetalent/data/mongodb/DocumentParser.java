@@ -10,13 +10,16 @@ import org.bson.codecs.DocumentCodec;
 import org.bson.codecs.configuration.CodecRegistries;
 import org.bson.codecs.configuration.CodecRegistry;
 
+@SuppressWarnings({"unused", "WeakerAccess"})
 public class DocumentParser {
 
 	final static CodecRegistry CODEC_REGISTRY = CodecRegistries.fromRegistries(MongoClient.getDefaultCodecRegistry());
-	final static DocumentCodec CODEC          = new DocumentCodec(CODEC_REGISTRY, new BsonTypeClassMap());
+	final static DocumentCodec CODEC = new DocumentCodec(CODEC_REGISTRY, new BsonTypeClassMap());
 
 	public static JsonObject toJson(Document document) {
-		if (document == null) { return null; }
+		if (document == null) {
+			return null;
+		}
 		return new JsonParser().parse(document.toJson(CODEC)).getAsJsonObject();
 	}
 

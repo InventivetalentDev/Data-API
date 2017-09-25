@@ -2,18 +2,15 @@ package org.inventivetalent.data.test;
 
 import com.google.gson.JsonObject;
 import org.inventivetalent.data.async.AsyncDataProvider;
-import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.mapper.AsyncCacheMapper;
 import org.inventivetalent.data.mapper.AsyncStringValueMapper;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
-import org.testng.annotations.Test;
+import org.junit.Test;
 
-import javax.annotation.Nonnull;
 import java.util.concurrent.CountDownLatch;
 
-import static org.testng.Assert.*;
+import static org.junit.Assert.*;
 
-@Test
 public class MongoDbTestX extends AbstractKeyValueTest {
 
 	private MongoDbDataProvider provider;
@@ -29,22 +26,18 @@ public class MongoDbTestX extends AbstractKeyValueTest {
 
 		for (int i = 0; i < keys.size(); i++) {
 			final int finalI = i;
-			provider.put(keys.get(i), new DataCallable<JsonObject>() {
-				@Nonnull
-				@Override
-				public JsonObject provide() {
-					latch.countDown();
-					JsonObject jsonObject = new JsonObject();
-					jsonObject.addProperty("val", values.get(finalI));
-					return jsonObject;
-				}
+			provider.put(keys.get(i), () -> {
+				latch.countDown();
+				JsonObject jsonObject = new JsonObject();
+				jsonObject.addProperty("val", values.get(finalI));
+				return jsonObject;
 			});
 		}
 
 		latch.await();
 	}
 
-	@Test(dependsOnMethods = { "putTest" })
+	@Test
 	public void getTest() throws InterruptedException {
 		CountDownLatch latch = new CountDownLatch(keys.size());
 
@@ -67,21 +60,13 @@ public class MongoDbTestX extends AbstractKeyValueTest {
 
 		CountDownLatch latch = new CountDownLatch(2);
 
-		stringProvider.put("foo", new DataCallable<String>() {
-			@Nonnull
-			@Override
-			public String provide() {
-				latch.countDown();
-				return "bar";
-			}
+		stringProvider.put("foo", () -> {
+			latch.countDown();
+			return "bar";
 		});
-		stringProvider.put("foo1", new DataCallable<String>() {
-			@Nonnull
-			@Override
-			public String provide() {
-				latch.countDown();
-				return "bar1";
-			}
+		stringProvider.put("foo1", () -> {
+			latch.countDown();
+			return "bar1";
 		});
 		latch.await();
 
