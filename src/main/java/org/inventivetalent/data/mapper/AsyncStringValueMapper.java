@@ -11,6 +11,7 @@ import org.inventivetalent.data.file.FileDataProvider;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.inventivetalent.data.redis.RedisDataProvider;
 import org.inventivetalent.data.sql.SQLDataProvider;
+import org.inventivetalent.data.sqlite.SQLiteDataProvider;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -25,6 +26,10 @@ public abstract class AsyncStringValueMapper {
 	}
 
 	public static AsyncDataProvider<String> sql(SQLDataProvider provider) {
+		return provider;
+	}
+
+	public static AsyncDataProvider<String> sqlite(SQLiteDataProvider provider) {
 		return provider;
 	}
 

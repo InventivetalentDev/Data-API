@@ -12,6 +12,7 @@ import org.inventivetalent.data.file.FileDataProvider;
 import org.inventivetalent.data.mongodb.MongoDbDataProvider;
 import org.inventivetalent.data.redis.RedisDataProvider;
 import org.inventivetalent.data.sql.SQLDataProvider;
+import org.inventivetalent.data.sqlite.SQLiteDataProvider;
 
 import javax.annotation.Nonnull;
 import java.util.Collection;
@@ -30,6 +31,10 @@ public class AsyncJsonValueMapper {
 	}
 
 	public static AsyncDataProvider<JsonObject> sql(SQLDataProvider provider) {
+		return new StringToJsonMapper(provider);
+	}
+
+	public static AsyncDataProvider<JsonObject> sqlite(SQLiteDataProvider provider) {
 		return new StringToJsonMapper(provider);
 	}
 
