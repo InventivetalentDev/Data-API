@@ -95,6 +95,25 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>inventive-repo</id>
+            <url>http://repo.inventivetalent.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>md_5-repo</id>
+            <url>http://repo.md-5.net/content/repositories/public/</url>
+        </repository>
+        <repository>
+            <id>sonatype</id>
+            <url>https://oss.sonatype.org/content/groups/public/</url>
+        </repository>
+        <repository>
+            <id>spigot-repo</id>
+            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
+        </repository>
+    </repositories>
+
     <distributionManagement>
         <repository>
             <id>sonatype-nexus-releases</id>
