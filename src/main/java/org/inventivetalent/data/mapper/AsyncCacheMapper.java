@@ -177,6 +177,10 @@ public class AsyncCacheMapper {
 		public int size() {
 			return (int) cache.size();
 		}
+
+		public void refresh(String key) {
+			this.cache.refresh(key);
+		}
 	}
 
 }
