@@ -1,7 +1,6 @@
 package org.inventivetalent.data.ebean;
 
 import com.avaje.ebean.EbeanServer;
-import lombok.SneakyThrows;
 import org.inventivetalent.data.async.AbstractAsyncDataProvider;
 import org.inventivetalent.data.async.DataCallable;
 import org.inventivetalent.data.async.DataCallback;
@@ -34,9 +33,12 @@ public class EbeanDataProvider<V extends KeyBean> extends AbstractAsyncDataProvi
 		return database;
 	}
 
-	@SneakyThrows
 	public V newBean() {
-		return beanClass.newInstance();
+		try {
+			return beanClass.newInstance();
+		} catch (Exception e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	@Override
