@@ -60,7 +60,7 @@
         <dependency>
             <groupId>org.mongodb</groupId>
             <artifactId>bson</artifactId>
-            <version>3.12.7</version>
+            <version>4.10.0-SNAPSHOT</version>
         </dependency>
 
         <!-- Redis -->
